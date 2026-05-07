@@ -4,7 +4,6 @@
 package ethtool
 
 import (
-	"encoding/binary"
 	"errors"
 	"fmt"
 	"os"
@@ -12,10 +11,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/josharian/native"
 	"github.com/mdlayher/genetlink"
 	"github.com/mdlayher/netlink"
 	"github.com/siderolabs/gen/optional"
+	"golang.org/x/sys/cpu"
 	"golang.org/x/sys/unix"
 )
 
@@ -193,7 +192,7 @@ func (lmu *LinkModeUpdate) encode(ae *netlink.AttributeEncoder) {
 			nae.Uint32(unix.ETHTOOL_A_BITSET_SIZE, uint32(bitlen))
 			b := make([]byte, ((bitlen+31)/32)*4)
 			b = lmu.Advertise.FillBytes(b)
-			if binary.ByteOrder(native.Endian) == binary.LittleEndian {
+			if !cpu.IsBigEndian {
 				// FillBytes is big endian, reverse bytes for host order
 				slices.Reverse(b)
 			}
@@ -331,9 +330,9 @@ func (fec FEC) encode(ae *netlink.AttributeEncoder) {
 // Supported returns the supported/configured FEC modes. Some drivers report
 // supported, others configured. See
 // https://kernel.googlesource.com/pub/scm/network/ethtool/ethtool/+/2b3ddcb35357ae34ed0a6ae2bb006dcdaec353a9
-func (f *FEC) Supported() FECModes {
-	result := f.Modes
-	if f.Auto {
+func (fec *FEC) Supported() FECModes {
+	result := fec.Modes
+	if fec.Auto {
 		result |= unix.ETHTOOL_FEC_AUTO
 	}
 	return result
@@ -1137,12 +1136,12 @@ func parseLinkState(msgs []genetlink.Message) ([]*LinkState, error) {
 
 // TODO: get these into x/sys/unix
 const (
-	_ETHTOOL_A_FEC_UNSPEC = iota
-	_ETHTOOL_A_FEC_HEADER
-	_ETHTOOL_A_FEC_MODES
-	_ETHTOOL_A_FEC_AUTO
-	_ETHTOOL_A_FEC_ACTIVE
-	_ETHTOOL_A_FEC_STATS
+	_ETHTOOL_A_FEC_UNSPEC = iota //nolint:revive
+	_ETHTOOL_A_FEC_HEADER        //nolint:revive
+	_ETHTOOL_A_FEC_MODES         //nolint:revive
+	_ETHTOOL_A_FEC_AUTO          //nolint:revive
+	_ETHTOOL_A_FEC_ACTIVE        //nolint:revive
+	_ETHTOOL_A_FEC_STATS         //nolint:revive
 )
 
 // parseFEC parses FEC structures from a slice of generic netlink
