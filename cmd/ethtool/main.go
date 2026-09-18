@@ -143,10 +143,21 @@ func run() error {
 
 	err = cli.SetPause(ethtool.Pause{
 		Interface: ethtool.Interface{Name: linkName},
-		Autoneg:   optional.Some[bool](true),
 		RX:        optional.Some[bool](false),
 		TX:        optional.Some[bool](false),
 	})
+	if err != nil {
+		return fmt.Errorf("failed to set pause: %v", err)
+	}
+
+	err = cli.SetPause(ethtool.Pause{
+		Interface: ethtool.Interface{Name: linkName},
+		Autoneg:   optional.Some[bool](true),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to set pause: %v", err)
+	}
+
 	if err != nil {
 		return fmt.Errorf("failed to set pause: %v", err)
 	}
