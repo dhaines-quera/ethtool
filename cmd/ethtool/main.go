@@ -119,5 +119,16 @@ func run() error {
 
 	fmt.Printf("Channels for %s: %#+v\n", linkName, channels)
 
+	pause, err := cli.Pause(ethtool.Interface{Name: linkName})
+	if err != nil {
+		if errors.Is(err, unix.EOPNOTSUPP) {
+			fmt.Printf("Pause (flow control) is not supported for %s\n", linkName)
+		} else {
+			return fmt.Errorf("failed to get pause settings: %v", err)
+		}
+	} else {
+		fmt.Printf("Pause for %s: RX %v TX %v Autoneg %v, all %#+v\n", linkName, pause.RX.ValueOrZero(), pause.TX.ValueOrZero(), pause.Autoneg.ValueOrZero(), pause)
+	}
+
 	return nil
 }
