@@ -1467,11 +1467,11 @@ func parsePause(msgs []genetlink.Message) ([]*Pause, error) {
 			case unix.ETHTOOL_A_PAUSE_HEADER:
 				ad.Nested(parseInterface(&p.Interface))
 			case unix.ETHTOOL_A_PAUSE_RX:
-				p.RX = optional.Some(ad.Uint32() != 0)
+				p.RX = optional.Some(ad.Uint8() != 0)
 			case unix.ETHTOOL_A_PAUSE_TX:
-				p.TX = optional.Some(ad.Uint32() != 0)
+				p.TX = optional.Some(ad.Uint8() != 0)
 			case unix.ETHTOOL_A_PAUSE_AUTONEG:
-				p.Autoneg = optional.Some(ad.Uint32() != 0)
+				p.Autoneg = optional.Some(ad.Uint8() != 0)
 			}
 		}
 
@@ -1639,25 +1639,25 @@ func (r Channels) encode(ae *netlink.AttributeEncoder) {
 func (p Pause) encode(ae *netlink.AttributeEncoder) {
 	if v, ok := p.RX.Get(); ok {
 		if v {
-			ae.Uint32(unix.ETHTOOL_A_PAUSE_RX, 1)
+			ae.Uint8(unix.ETHTOOL_A_PAUSE_RX, 1)
 		} else {
-			ae.Uint32(unix.ETHTOOL_A_PAUSE_RX, 0)
+			ae.Uint8(unix.ETHTOOL_A_PAUSE_RX, 0)
 		}
 	}
 
 	if v, ok := p.TX.Get(); ok {
 		if v {
-			ae.Uint32(unix.ETHTOOL_A_PAUSE_TX, 1)
+			ae.Uint8(unix.ETHTOOL_A_PAUSE_TX, 1)
 		} else {
-			ae.Uint32(unix.ETHTOOL_A_PAUSE_TX, 0)
+			ae.Uint8(unix.ETHTOOL_A_PAUSE_TX, 0)
 		}
 	}
 
 	if v, ok := p.Autoneg.Get(); ok {
 		if v {
-			ae.Uint32(unix.ETHTOOL_A_PAUSE_AUTONEG, 1)
+			ae.Uint8(unix.ETHTOOL_A_PAUSE_AUTONEG, 1)
 		} else {
-			ae.Uint32(unix.ETHTOOL_A_PAUSE_AUTONEG, 0)
+			ae.Uint8(unix.ETHTOOL_A_PAUSE_AUTONEG, 0)
 		}
 	}
 }
